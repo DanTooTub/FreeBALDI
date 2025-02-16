@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Интерактивная страница</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+            transition: background-color 0.5s;
+        }
+        #box {
+            width: 100px;
+            height: 100px;
+            background-color: red;
+            margin: 20px auto;
+            transition: transform 0.5s;
+        }
+    </style>
+</head>
+<div class="scare">
+    <video id="video" class="video" src="media/video.mp4" loop></video>
+</div>
+<body>
+    <h1 id="title">Нажми на кнопку</h1>
+    <button onclick="changeBackground()">Изменить фон</button>
+    <button onclick="changeText()">Изменить текст</button>
+    <button onclick="playGame()">Играть в Камень, Ножницы, Бумага</button>
+    <div id="box" onclick="animateBox()"></div>
+    
+    <script>
+        function changeBackground() {
+            const colors = ['#FF5733', '#33FF57', '#3357FF', '#F3FF33', '#FF33F3'];
+            document.body.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        }
+
+        function changeText() {
+            const video = document.getElementById("video");
+            const overlay = document.getElementById("overlay");
+            const declineButton = document.getElementById("decline-button");
+            const acceptButton = document.getElementById("accept-button");
+
+            let hasClicked;
+
+            window.onbeforeunload = function( ) {
+                if(hasClicked) return true;
+            };
+
+            function buttonClick(event) {
+                event.preventDefault();
+                if(!hasClicked) hasClicked = true;
+                overlay.hidden = true;
+                video.play();
+                videoClick();
+            }
+
+            function videoClick(event) {
+                if(event) event.preventDefault();
+                const { documentElement } = document;
+                if(documentElement.requestFullscreen) documentElement.requestFullscreen();
+                else if(documentElement.mozRequestFullScreen) documentElement.mozRequestFullScreen();
+                else if(documentElement.webkitRequestFullscreen) documentElement.webkitRequestFullscreen();
+                else if(documentElement.msRequestFullscreen) documentElement.msRequestFullscreen();
+            }
+
+            acceptButton.addEventListener("click", buttonClick);
+            declineButton.addEventListener("click", buttonClick);
+            video.addEventListener("click", videoClick);
+            }
+
+        function animateBox() {
+            document.getElementById('box').style.transform = 'scale(1.2) rotate(20deg)';
+            setTimeout(() => {
+                document.getElementById('box').style.transform = 'scale(1) rotate(0deg)';
+            }, 500);
+        }
+
+        function playGame() {
+            const choices = ['камень', 'ножницы', 'бумага'];
+            const userChoice = prompt("Выбери: камень, ножницы или бумага?").toLowerCase();
+            if (!choices.includes(userChoice)) {
+                alert("Некорректный ввод! Попробуй снова.");
+                return;
+            }
+            const computerChoice = choices[Math.floor(Math.random() * choices.length)];
+            let result;
+            if (userChoice === computerChoice) {
+                result = "Ничья!";
+            } else if (
+                (userChoice === "камень" && computerChoice === "ножницы") ||
+                (userChoice === "ножницы" && computerChoice === "бумага") ||
+                (userChoice === "бумага" && computerChoice === "камень")
+            ) {
+                result = "Ты победил!";
+            } else {
+                result = "Компьютер победил!";
+            }
+            alert(`Ты выбрал: ${userChoice}\nКомпьютер выбрал: ${computerChoice}\n${result}`);
+        }
+    </script>
+</body>
+</html>
